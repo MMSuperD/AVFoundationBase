@@ -7,6 +7,6 @@ target '音视频项目' do
 
   # Pods for 音视频项目
 
-  #pod 'Masonry'
+  pod 'Masonry'
 
 end
