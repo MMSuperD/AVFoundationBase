@@ -8,6 +8,7 @@
 
 #import "VideoPlayerViewController.h"
 #import <Masonry.h>
+#import "SDPlayerManager.h"
 
 @interface VideoPlayerViewController ()
 
@@ -28,6 +29,12 @@
  */
 @property (weak,nonatomic)UIButton *playerBtn;
 
+
+/**
+ 播放管理者
+ */
+@property (nonatomic, strong) SDPlayerManager *manager;
+
 @end
 
 @implementation VideoPlayerViewController
@@ -37,13 +44,19 @@
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
     [self setupUI];
+    [self initData];
+}
+
+- (void)initData {
+   // NSURL *url = [NSURL URLWithString:@"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"];
+    NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"jlzg0226" ofType:@"mp4"]];
+    self.manager = [[SDPlayerManager alloc] initWithURL:url];
 }
 
 
 #pragma 设置UI界面
 - (void)setupUI {
-    
-    
+     
     UIView *contentView = [UIView new];
     self.contentView = contentView;
     [self.view addSubview:contentView];
@@ -80,13 +93,29 @@
         make.centerY.mas_equalTo(self.playerView.mas_centerY);
     }];
     
+
+}
+
+- (void)setVideoPlayer {
+    [self.manager showPlayerInView:self.playerView withFrame:self.playerView.bounds];
     
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    [self setVideoPlayer];
     
 }
 
 - (void)actionPlayBtn:(UIButton *)sender {
     
-    NSLog(@"Play");
+    [self.manager startPlay];
+}
+
+- (void)dealloc
+{
+    NSLog(@"%@",NSStringFromClass([self class]));
 }
 
 @end
