@@ -46,6 +46,17 @@
     return _manager;
 }
 
+- (void)addNotificationAndObserver {
+    // 添加播放完成通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    // 添加打断播放的通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interruptionComing:) name:AVAudioSessionInterruptionNotification object:nil];
+    // 添加插拔耳机的通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
+    // 添加观察者监控播放器状态
+    [self addObserver:self forKeyPath:@"playStatus" options:NSKeyValueObservingOptionNew context:nil];
+}
+
 
 /**
  创建Playerlayer
@@ -202,7 +213,30 @@
     } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){ //当缓存足够的时候,不要播放
         
         [self.player play];
+    } else if ([keyPath isEqualToString:@"playStatus"]) { //这里播放状态的切换
+        
+        if ([self.delegate respondsToSelector:@selector(currentItemPlayStatus:player:)]) {
+            [self.delegate currentItemPlayStatus:self.playStatus player:self.player];
+        }
     }
+    
+}
+
+#pragma Notification
+  // 添加播放完成通知
+- (void)playbackFinished:(NSNotification *)sender {
+    
+    
+}
+// 添加打断播放的通知
+- (void)interruptionComing:(NSNotification *)sender {
+    
+    
+}
+
+// 添加插拔耳机的通知
+- (void)routeChanged:(NSNotification *)sender {
+    
     
 }
 
