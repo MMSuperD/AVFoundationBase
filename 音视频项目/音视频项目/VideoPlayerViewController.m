@@ -64,6 +64,13 @@
  */
 @property (nonatomic,assign)CGFloat currentTime;
 
+/**
+ 缓存时间
+ */
+@property (nonatomic,assign)CGFloat loadedTime;
+
+
+
 
 /**
  播放管理者
@@ -83,7 +90,7 @@
 }
 
 - (void)initData {
-   // NSURL *url = [NSURL URLWithString:@"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"];
+  //  NSURL *url = [NSURL URLWithString:@"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"];
     NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"jlzg0226" ofType:@"mp4"]];
     self.manager = [[SDPlayerManager alloc] initWithURL:url];
     self.manager.delegate = self;
@@ -148,11 +155,14 @@
     UIProgressView *loadProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
     self.loadProgress = loadProgress;
     [self.contentView addSubview:loadProgress];
+    self.loadProgress.backgroundColor = [UIColor orangeColor];
     
     UISlider *playProgress = [UISlider new];
     self.playProgress = playProgress;
     [self.contentView addSubview:playProgress];
     [self.playProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
+    playProgress.minimumTrackTintColor = [UIColor redColor];
+    [self.playProgress addTarget:self action:@selector(actionSlider:) forControlEvents:UIControlEventValueChanged];
     
     [self.curTimerLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.leading.bottom.mas_equalTo(self.contentView);
@@ -191,6 +201,12 @@
     
     [self setVideoPlayer];
     [self refreshUI];
+    
+}
+
+- (void)actionSlider:(UISlider *)sender {
+    
+    [self.manager seekToTime:sender.value * self.totalTime];
     
 }
 
@@ -292,6 +308,10 @@
     //这里是刷新进度条
     self.playProgress.value = self.currentTime / self.totalTime;
     
+    if (self.totalTime > 0) {
+        [self.loadProgress setProgress:self.loadedTime / self.totalTime];
+    }
+    
 }
 
 - (void)dealloc
@@ -333,8 +353,7 @@
  @param player 播放器
  */
 - (void)currentItemLoadedProgress:(CGFloat)time player:(AVPlayer *)player {
-    
-    
+    self.loadedTime = time;
 }
 
 

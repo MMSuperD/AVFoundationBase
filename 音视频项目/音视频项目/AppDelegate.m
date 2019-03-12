@@ -10,6 +10,8 @@
 
 @interface AppDelegate ()
 
+
+
 @end
 
 @implementation AppDelegate
@@ -45,6 +47,25 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma 横竖屏支持
+
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    
+    if (self.allowRotation == 1) {
+        return UIInterfaceOrientationMaskAll;
+    } else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+}
+
+- (BOOL)shouldAutorotate {
+    if (self.allowRotation == 1) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 

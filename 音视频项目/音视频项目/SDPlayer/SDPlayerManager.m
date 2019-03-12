@@ -57,7 +57,7 @@
     
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
     self.playerLayer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-    self.playerLayer.backgroundColor = [UIColor purpleColor].CGColor;
+   // self.playerLayer.backgroundColor = [UIColor purpleColor].CGColor;
     self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [view.layer addSublayer:self.playerLayer];
     
@@ -66,22 +66,30 @@
 
 /**
  更新Item
- @param URL 路径
+ @param  url 视频路径
  */
 - (void)replaceCurrentItemWithURL:(NSURL *)url {
     
 //    //移除当前观察者
-//    if (_currentItem) {
-//        //这里需要移除以前的监听
-//        [_currentItem removeObserver:self forKeyPath:@"status"];
-//        [_currentItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
-//    }
+    if (_currentItem) {
+        //这里需要移除以前的监听
+        [_currentItem removeObserver:self forKeyPath:@"status"];
+        [_currentItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
+        [_currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
+        [_currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
+    }
     _currentItem = [[AVPlayerItem alloc] initWithURL:url];
     [self.player replaceCurrentItemWithPlayerItem:_currentItem];
     
-//    //重新添加观察
+    //重新添加观察
+    //1.0 这个是播放器的加载URR状态
     [_currentItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    //2.0 这个是播放器缓存的加载的范围
     [_currentItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
+    //3.0 监听playbackBufferEmpty我们可以获取当缓存不够，视频加载不出来的情况：
+    [_currentItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:nil];
+    //4.0 playbackLikelyToKeepUp监听缓存足够播放的状态
+    [_currentItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew context:nil];
     
     
 }
@@ -128,7 +136,7 @@
 
 - (void)seekToTime:(CGFloat)time {
     
-    [self.currentItem seekToTime:CMTimeMakeWithSeconds(time, 1) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
+    [self.currentItem seekToTime:CMTimeMakeWithSeconds(time, 60) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
         
     }];
 }
@@ -136,7 +144,7 @@
 #pragma mark - 观察者
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     
-    if ([keyPath isEqualToString:@"status"]) {
+    if ([keyPath isEqualToString:@"status"]) { //这个是播放器的状态
         
         AVPlayerStatus status = [[change objectForKey:NSKeyValueChangeNewKey] intValue];
         switch (status) {
@@ -165,7 +173,7 @@
                 break;
         }
         
-    } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
+    } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {//这个是缓存范围
         
         NSArray *loadedTimeRanges = [_currentItem loadedTimeRanges];
         CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
@@ -189,6 +197,11 @@
         }
         
         
+    } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//当缓存不够的时候需要做什么自己定,肯定这个时候不会处于播放状态
+        
+    } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){ //当缓存足够的时候,不要播放
+        
+        [self.player play];
     }
     
 }
