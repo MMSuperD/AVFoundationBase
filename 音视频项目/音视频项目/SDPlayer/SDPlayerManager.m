@@ -33,6 +33,7 @@
     if (self) {
         [self replaceCurrentItemWithURL:url];
         self.playStatus = SDPlayerStatusPausing;
+        [self addNotificationAndObserver];
     }
     return self;
 }
@@ -57,6 +58,18 @@
     [self addObserver:self forKeyPath:@"playStatus" options:NSKeyValueObservingOptionNew context:nil];
 }
 
+- (void)removeNotificationAddObserver {
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self removeObserver:self forKeyPath:@"playStatus"];
+    if (_currentItem) {
+        [_currentItem removeObserver:self forKeyPath:@"status"];
+        [_currentItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
+        [_currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
+        [_currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
+    }
+}
+
 
 /**
  创建Playerlayer
@@ -71,6 +84,34 @@
    // self.playerLayer.backgroundColor = [UIColor purpleColor].CGColor;
     self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [view.layer addSublayer:self.playerLayer];
+    
+    //////////////////////////////////////////////
+   // 这里的作用是让视屏启动就可以看到图片,不过这样不太好,最好的还是自己截取一张图片,或是各一张图片良样例,这样用户看起来才会好看
+//    [self startPlay];
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [self pausePlay];
+//    });
+    /////////////////////////////////////////////
+}
+
+
+/**
+ 根据本地视屏路径截取第一张图片用来做第一个界面
+
+ @param urlString <#urlString description#>
+ @return <#return value description#>
+ */
+- (UIImage *)getVideoProViewImage:(NSURL *)urlString {
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:urlString options:nil];
+    AVAssetImageGenerator *assetGen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    assetGen.appliesPreferredTrackTransform = YES;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    NSError *error = nil;
+    CMTime actualTime;
+    CGImageRef image = [assetGen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    UIImage *videoImage = [[UIImage alloc] initWithCGImage:image];
+    CGImageRelease(image);
+    return videoImage;
     
 }
 
@@ -108,17 +149,15 @@
 - (void)startPlay {
     [self.player play];
     self.playStatus = SDPlayerStatusPlaying;
-    // 发起开始播放的通知
-   // [[NSNotificationCenter defaultCenter] postNotificationName:SDPlayerDidStartPlayNotification object:self.player];
     if ([self.delegate respondsToSelector:@selector(currentItemPlayStatus:player:)]) {
-        [self.delegate currentItemPlayStatus:self.playStatus player:self.player];
+        [self.delegate currentItemPlayStatus:self.playStatus player:_player];
     }
     __weak SDPlayerManager *weakSelf = self;
     //观察播放进度
     [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 60) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         
         if ([weakSelf.delegate respondsToSelector:@selector(currentItemTimeProgress:player:)]) {
-            CGFloat time = self.player.currentTime.value / weakSelf.player.currentTime.timescale;
+            CGFloat time = weakSelf.player.currentTime.value / weakSelf.player.currentTime.timescale;
             [weakSelf.delegate currentItemTimeProgress:time player:weakSelf.player];
         }
         
@@ -131,7 +170,7 @@
         NSLog(@"finished:%d",finished);
     }];
     [self.currentItem cancelPendingSeeks];
-    self.playStatus = SDPlayerStatusFinished;
+    self.playStatus = SDPlayerStatusPausing;
     
 }
 
@@ -166,7 +205,6 @@
                     CGFloat duration = CMTimeGetSeconds(self.currentItem.duration);
                     [self.delegate currentItemDurationTime:duration player:self.player];
                 }
-                
                 break;
             }
             case AVPlayerStatusUnknown:
@@ -209,10 +247,11 @@
         
         
     } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]){//当缓存不够的时候需要做什么自己定,肯定这个时候不会处于播放状态
+        NSLog(@"这里是缓存不够的时候,不能播放");
         
-    } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){ //当缓存足够的时候,不要播放
-        
-        [self.player play];
+    } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]){ //当缓存足够的时候,可以直接播放
+      //  [self.player play];
+        NSLog(@"这里是缓存足够的时候,可以直接播放,就是打开这个界面就可以播放");
     } else if ([keyPath isEqualToString:@"playStatus"]) { //这里播放状态的切换
         
         if ([self.delegate respondsToSelector:@selector(currentItemPlayStatus:player:)]) {
@@ -226,18 +265,52 @@
   // 添加播放完成通知
 - (void)playbackFinished:(NSNotification *)sender {
     
+    AVPlayerItem *playerItem = sender.object;
+    
+    if (self.currentItem == playerItem) {
+        //self.playStatus = SDPlayerStatusFinished;
+        [self stopPlay];
+    }
+    
     
 }
-// 添加打断播放的通知
+// 添加打断播放的通知(来电,闹铃打断播放通知)
 - (void)interruptionComing:(NSNotification *)sender {
+    NSDictionary *userInfo = sender.userInfo;
     
+    AVAudioSessionInterruptionType type = [userInfo[AVAudioSessionInterruptionTypeKey] intValue];
+    
+    if (type == AVAudioSessionInterruptionTypeBegan) {
+        [self pausePlay];
+    }
     
 }
 
 // 添加插拔耳机的通知
 - (void)routeChanged:(NSNotification *)sender {
     
+    NSDictionary *dic = sender.userInfo;
     
+    AVAudioSessionRouteChangeReason reason = [dic[AVAudioSessionRouteChangeReasonKey] intValue];
+    
+    //旧输出不可用
+    if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
+        AVAudioSessionRouteDescription *routeDescription = dic[AVAudioSessionRouteChangePreviousRouteKey];
+        AVAudioSessionPortDescription *portDescription = [routeDescription.outputs firstObject];
+        
+        //原设备为耳机则暂停
+        if ([portDescription.portType isEqualToString:@"Headphones"]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self pausePlay];
+            });
+        }
+    }
+    
+}
+
+- (void)dealloc
+{
+    [self removeNotificationAddObserver];
 }
 
 

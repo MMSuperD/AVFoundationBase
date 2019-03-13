@@ -87,6 +87,9 @@
     self.view.backgroundColor = [UIColor whiteColor];
     [self setupUI];
     [self initData];
+    
+    [self setVideoPlayer];
+    [self refreshUI];
 }
 
 - (void)initData {
@@ -188,6 +191,10 @@
     [self.playProgress mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.leading.trailing.bottom.mas_equalTo(self.loadProgress);
     }];
+    
+    [self.view layoutIfNeeded];
+    
+  
 
 }
 
@@ -199,9 +206,7 @@
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
-    [self setVideoPlayer];
-    [self refreshUI];
-    
+   
 }
 
 - (void)actionSlider:(UISlider *)sender {
