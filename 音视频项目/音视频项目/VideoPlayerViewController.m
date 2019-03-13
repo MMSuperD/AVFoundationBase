@@ -54,6 +54,9 @@
 @property (weak,nonatomic)UILabel *totalTimerLabel;
 
 
+
+
+
 /**
  总时间
  */
@@ -191,6 +194,7 @@
     [self.playProgress mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.leading.trailing.bottom.mas_equalTo(self.loadProgress);
     }];
+    
     
     [self.view layoutIfNeeded];
     

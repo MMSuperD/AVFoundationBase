@@ -7,8 +7,44 @@
 //
 
 #import "SDPlayerManager.h"
+#import "AppDelegate.h"
+#import "Masonry.h"
+
+@interface SDPlayerManager()
+
+@property (strong,nonatomic)UIButton *switchBtn;
+
+@property (strong,nonatomic)UIButton *backBtn;
+
+@property (weak,nonatomic)UIView *showView;
+
+@end
 
 @implementation SDPlayerManager
+
+- (UIButton *)switchBtn {
+    
+    if (_switchBtn == nil) {
+        
+        _switchBtn = [UIButton buttonWithType:0];
+        [_switchBtn setImage:[UIImage imageNamed:@"Screen"] forState:UIControlStateNormal];
+        [_switchBtn addTarget:self action:@selector(actionSwitchBtn:) forControlEvents:UIControlEventTouchUpInside];
+        
+    }
+    return _switchBtn;
+}
+
+- (UIButton *)backBtn {
+    
+    if (_backBtn == nil) {
+        
+        _backBtn = [UIButton buttonWithType:0];
+        [_backBtn setImage:[UIImage imageNamed:@"dfs"] forState:UIControlStateNormal];
+        [_backBtn addTarget:self action:@selector(actionSwitchBtn:) forControlEvents:UIControlEventTouchUpInside];
+        
+    }
+    return _backBtn;
+}
 
 - (instancetype)init
 {
@@ -54,12 +90,17 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interruptionComing:) name:AVAudioSessionInterruptionNotification object:nil];
     // 添加插拔耳机的通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
+    
+    //添加设备旋转通知
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDeviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     // 添加观察者监控播放器状态
     [self addObserver:self forKeyPath:@"playStatus" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)removeNotificationAddObserver {
     
+    [[UIDevice currentDevice]endGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self removeObserver:self forKeyPath:@"playStatus"];
     if (_currentItem) {
@@ -84,6 +125,10 @@
    // self.playerLayer.backgroundColor = [UIColor purpleColor].CGColor;
     self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [view.layer addSublayer:self.playerLayer];
+    self.showView = view;
+    
+    [view addSubview:self.switchBtn];
+    self.switchBtn.frame = CGRectMake(view.frame.size.width - 80, view.frame.size.height - 80, 60, 60);
     
     //////////////////////////////////////////////
    // 这里的作用是让视屏启动就可以看到图片,不过这样不太好,最好的还是自己截取一张图片,或是各一张图片良样例,这样用户看起来才会好看
@@ -92,6 +137,32 @@
 //        [self pausePlay];
 //    });
     /////////////////////////////////////////////
+}
+
+#pragma 切换横竖屏
+- (void)actionSwitchBtn:(UIButton *)sender {
+    
+    NSLog(@"切换横竖屏");
+    AppDelegate  *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    appDelegate.allowRotation = 1;
+    
+    [UIView animateWithDuration:1 animations:^{
+         [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIInterfaceOrientationLandscapeRight] forKey:@"orientation"];
+    }];
+}
+
+// 防止更改设备的横竖屏不起作用
+-(void)orientationToPortrait:(UIInterfaceOrientation)orientation{
+    
+    SEL seletor = NSSelectorFromString(@"setOrientation:");
+    
+    NSInvocation *invocatino = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:seletor]];
+    [invocatino setSelector:seletor];
+    [invocatino setTarget:[UIDevice currentDevice]];
+    int val = orientation;
+    [invocatino setArgument:&val atIndex:2];
+    [invocatino invoke];
+    
 }
 
 
@@ -312,6 +383,75 @@
 {
     [self removeNotificationAddObserver];
 }
+
+
+#pragma 设备旋转通知
+- (void)handleDeviceOrientationDidChange:(NSNotification *)sender {
+    
+    //1.获取 当前设备 实例
+    UIDevice *device = [UIDevice currentDevice] ;
+    /**
+     *  2.取得当前Device的方向，Device的方向类型为Integer
+     *
+     *  必须调用beginGeneratingDeviceOrientationNotifications方法后，此orientation属性才有效，否则一直是0。orientation用于判断设备的朝向，与应用UI方向无关
+     *
+     *  @param device.orientation
+     *
+     */
+    
+    switch (device.orientation) {
+        case UIDeviceOrientationFaceUp:
+            NSLog(@"屏幕朝上平躺");
+            break;
+            
+        case UIDeviceOrientationFaceDown:
+            NSLog(@"屏幕朝下平躺");
+            break;
+            
+            //系統無法判斷目前Device的方向，有可能是斜置
+        case UIDeviceOrientationUnknown:
+            NSLog(@"未知方向");
+            break;
+            
+        case UIDeviceOrientationLandscapeLeft:
+        {
+            NSLog(@"屏幕向左横置");
+//            UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+//            
+//            [keyWindow addSubview:self.showView];
+//            
+//            [self.showView mas_makeConstraints:^(MASConstraintMaker *make) {
+//                
+//                make.edges.mas_equalTo(keyWindow);
+//            }];
+//            
+//            self.playerLayer.frame = keyWindow.frame ;
+            
+            break;
+            
+        }
+          
+            
+        case UIDeviceOrientationLandscapeRight:
+            NSLog(@"屏幕向右橫置");
+            break;
+            
+        case UIDeviceOrientationPortrait:
+            NSLog(@"屏幕直立");
+            break;
+            
+        case UIDeviceOrientationPortraitUpsideDown:
+            NSLog(@"屏幕直立，上下顛倒");
+            break;
+            
+        default:
+            NSLog(@"无法辨识");
+            break;
+    }
+}
+
+
+
 
 
 @end
