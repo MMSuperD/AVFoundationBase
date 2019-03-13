@@ -416,17 +416,6 @@
         case UIDeviceOrientationLandscapeLeft:
         {
             NSLog(@"屏幕向左横置");
-//            UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-//            
-//            [keyWindow addSubview:self.showView];
-//            
-//            [self.showView mas_makeConstraints:^(MASConstraintMaker *make) {
-//                
-//                make.edges.mas_equalTo(keyWindow);
-//            }];
-//            
-//            self.playerLayer.frame = keyWindow.frame ;
-            
             break;
             
         }

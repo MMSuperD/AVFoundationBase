@@ -7,10 +7,24 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import <AVFoundation/AVFoundation.h>
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PlayerShowView : UIView
+
+
+
+/**
+ 根据播放器设置页面
+
+ @param player 播放器
+ */
+- (void)setVideoPage:(AVPlayer *)player;
+
+@end
+
+@interface ControlShowView : UIView
+
 
 @end
 

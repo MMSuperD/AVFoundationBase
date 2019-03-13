@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "VideoPlayerViewController.h"
+#import "SD_AVPlayerViewController.h"
 
 @interface ViewController ()
 
@@ -23,7 +24,10 @@
 
 - (IBAction)actionPlayerViewControlelr:(UIButton *)sender {
     
-    VideoPlayerViewController *vc = [VideoPlayerViewController new];
+//    VideoPlayerViewController *vc = [VideoPlayerViewController new];
+//
+//    [self.navigationController pushViewController:vc animated:YES];
+    SD_AVPlayerViewController *vc = [SD_AVPlayerViewController new];
     
     [self.navigationController pushViewController:vc animated:YES];
     
