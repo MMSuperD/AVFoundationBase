@@ -16,6 +16,9 @@
 		7AB274412235F1AA00588193 /* VideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AB274402235F1AA00588193 /* VideoPlayerViewController.m */; };
 		7AB274482235FC6600588193 /* SDPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AB274472235FC6600588193 /* SDPlayerManager.m */; };
 		7AB2744A2236052100588193 /* jlzg0226.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7AB274492236052100588193 /* jlzg0226.mp4 */; };
+		7AB2744E2238ED5400588193 /* PlayerControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AB2744D2238ED5400588193 /* PlayerControl.m */; };
+		7AB274512238ED7200588193 /* PlayerShowView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AB274502238ED7200588193 /* PlayerShowView.m */; };
+		7AB274542238EDC800588193 /* SD_AVPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AB274532238EDC800588193 /* SD_AVPlayerViewController.m */; };
 		A304EA3D7C0CC55237D6FC54 /* libPods-音视频项目.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 88F22468473D7936E82E426D /* libPods-音视频项目.a */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +38,12 @@
 		7AB274462235FC6600588193 /* SDPlayerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDPlayerManager.h; sourceTree = "<group>"; };
 		7AB274472235FC6600588193 /* SDPlayerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SDPlayerManager.m; sourceTree = "<group>"; };
 		7AB274492236052100588193 /* jlzg0226.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = jlzg0226.mp4; sourceTree = "<group>"; };
+		7AB2744C2238ED5400588193 /* PlayerControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerControl.h; sourceTree = "<group>"; };
+		7AB2744D2238ED5400588193 /* PlayerControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayerControl.m; sourceTree = "<group>"; };
+		7AB2744F2238ED7200588193 /* PlayerShowView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerShowView.h; sourceTree = "<group>"; };
+		7AB274502238ED7200588193 /* PlayerShowView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayerShowView.m; sourceTree = "<group>"; };
+		7AB274522238EDC800588193 /* SD_AVPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SD_AVPlayerViewController.h; sourceTree = "<group>"; };
+		7AB274532238EDC800588193 /* SD_AVPlayerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SD_AVPlayerViewController.m; sourceTree = "<group>"; };
 		88F22468473D7936E82E426D /* libPods-音视频项目.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-音视频项目.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEA0EB42ADA35D876765FCDC /* Pods-音视频项目.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音视频项目.release.xcconfig"; path = "Target Support Files/Pods-音视频项目/Pods-音视频项目.release.xcconfig"; sourceTree = "<group>"; };
 		F69248B2252B2DB2454BCAC6 /* Pods-音视频项目.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-音视频项目.debug.xcconfig"; path = "Target Support Files/Pods-音视频项目/Pods-音视频项目.debug.xcconfig"; sourceTree = "<group>"; };
@@ -81,6 +90,7 @@
 		7AB274282235F0F900588193 /* 音视频项目 */ = {
 			isa = PBXGroup;
 			children = (
+				7AB2744B2238ED1A00588193 /* Class */,
 				7AB274452235FC3300588193 /* SDPlayer */,
 				7AB274292235F0F900588193 /* AppDelegate.h */,
 				7AB2742A2235F0F900588193 /* AppDelegate.m */,
@@ -105,6 +115,19 @@
 				7AB274472235FC6600588193 /* SDPlayerManager.m */,
 			);
 			path = SDPlayer;
+			sourceTree = "<group>";
+		};
+		7AB2744B2238ED1A00588193 /* Class */ = {
+			isa = PBXGroup;
+			children = (
+				7AB2744C2238ED5400588193 /* PlayerControl.h */,
+				7AB2744D2238ED5400588193 /* PlayerControl.m */,
+				7AB2744F2238ED7200588193 /* PlayerShowView.h */,
+				7AB274502238ED7200588193 /* PlayerShowView.m */,
+				7AB274522238EDC800588193 /* SD_AVPlayerViewController.h */,
+				7AB274532238EDC800588193 /* SD_AVPlayerViewController.m */,
+			);
+			path = Class;
 			sourceTree = "<group>";
 		};
 		7FAF68EC0D98FAE2C13E82CE /* Pods */ = {
@@ -213,11 +236,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AB2744E2238ED5400588193 /* PlayerControl.m in Sources */,
 				7AB2742E2235F0F900588193 /* ViewController.m in Sources */,
 				7AB274412235F1AA00588193 /* VideoPlayerViewController.m in Sources */,
+				7AB274512238ED7200588193 /* PlayerShowView.m in Sources */,
 				7AB274392235F0FA00588193 /* main.m in Sources */,
 				7AB274482235FC6600588193 /* SDPlayerManager.m in Sources */,
 				7AB2742B2235F0F900588193 /* AppDelegate.m in Sources */,
+				7AB274542238EDC800588193 /* SD_AVPlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
