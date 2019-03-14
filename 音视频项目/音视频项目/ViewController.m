@@ -29,7 +29,7 @@
 //    [self.navigationController pushViewController:vc animated:YES];
     SD_AVPlayerViewController *vc = [SD_AVPlayerViewController new];
     
-    [self.navigationController pushViewController:vc animated:YES];
+    [self presentViewController:vc animated:YES completion:nil];
     
 }
 

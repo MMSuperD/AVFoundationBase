@@ -386,6 +386,7 @@
 			baseConfigurationReference = F69248B2252B2DB2454BCAC6 /* Pods-音视频项目.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8SJC8P4YK8;
 				INFOPLIST_FILE = "音视频项目/Info.plist";
@@ -405,6 +406,7 @@
 			baseConfigurationReference = AEA0EB42ADA35D876765FCDC /* Pods-音视频项目.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8SJC8P4YK8;
 				INFOPLIST_FILE = "音视频项目/Info.plist";

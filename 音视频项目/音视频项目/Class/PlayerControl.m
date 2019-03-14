@@ -67,10 +67,6 @@
 //    [self addObserver:self forKeyPath:@"playStatus" options:NSKeyValueObservingOptionNew context:nil];
 }
 
-
-/**
- 移除监听和通知
- */
 - (void)removeNotificationAddObserver {
     
     [[UIDevice currentDevice]endGeneratingDeviceOrientationNotifications];
@@ -83,6 +79,41 @@
         [_currentPlayerItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp"];
     }
 }
+
+#pragma Function
+- (void)startPlay {
+    [self.currentPlayer play];
+    self.playStatus = SDPlayerStatusPlaying;
+
+    __weak PlayerControl *weakSelf = self;
+    //观察播放进度
+    [self.currentPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 60) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
+        
+    }];
+}
+
+- (void)stopPlay {
+    [self.currentPlayer pause];
+    [self.currentPlayerItem seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
+        NSLog(@"finished:%d",finished);
+    }];
+    [self.currentPlayerItem cancelPendingSeeks];
+    self.playStatus = SDPlayerStatusPausing;
+    
+}
+
+- (void)pausePlay {
+    [self.currentPlayer pause];
+    self.playStatus = SDPlayerStatusPausing;
+}
+
+- (void)seekToTime:(CGFloat)time {
+    
+    [self.currentPlayerItem seekToTime:CMTimeMakeWithSeconds(time, 60) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
+        
+    }];
+}
+
 
 #pragma 通知处理
 

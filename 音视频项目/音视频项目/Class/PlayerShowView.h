@@ -12,8 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PlayerShowView : UIView
 
-
-
 /**
  根据播放器设置页面
 
@@ -23,7 +21,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+typedef NS_ENUM(NSUInteger,ButtonState) {
+    ButtonStatePlaying,
+    ButtonStatePause,
+};
+
+@protocol ControlShowViewDelegate <NSObject>
+
+- (void)playChangeState:(ButtonState)btnState;
+
+- (void)fullScreen;
+
+@end
+
 @interface ControlShowView : UIView
+
+@property (nonatomic,assign)ButtonState btnState;
+
+@property (nonatomic,weak)id<ControlShowViewDelegate> delegate;
+
+@end
+
+@interface ControlShowProgressView : UIView
 
 
 @end
