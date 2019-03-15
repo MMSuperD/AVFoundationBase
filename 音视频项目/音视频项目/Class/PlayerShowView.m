@@ -25,6 +25,10 @@
 
 @implementation PlayerShowView
 
+//+ (Class)layerClass  {
+//    return [AVPlayerLayer class];
+//}
+
 - (instancetype)init
 {
     self = [super init];
@@ -44,8 +48,38 @@
     return _imageView;
 }
 
+- (void)setBtnState:(ButtonState)btnState {
+    _btnState = btnState;
+    self.controlView.btnState = btnState;
+}
+
+- (void)setProgressValue:(CGFloat)progressValue {
+    _progressValue = progressValue;
+    self.controlView.progressValue = progressValue;
+}
+
+- (void)setTotalTimeValue:(CGFloat)totalTimeValue {
+    _totalTimeValue = totalTimeValue;
+    self.controlView.totalTimeValue = totalTimeValue;
+}
+
+- (void)setCurrentTimeValue:(CGFloat)currentTimeValue {
+    _currentTimeValue = currentTimeValue;
+    self.controlView.currentTimeValue = currentTimeValue;
+}
+
+- (void)setProgressBlock:(ProgressBlock)progressBlock {
+    _progressBlock = progressBlock;
+    self.controlView.progressBlock = progressBlock;
+}
+
 - (void)setVideoPage:(AVPlayer *)player {
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
+    //self.playerLayer = (AVPlayerLayer *)self.layer;
+  //  [self.playerLayer setPlayer:player];
+    //这个属性特别重要设置视频Layer  适配
+    self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+   // self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [self.layer addSublayer:self.playerLayer];
     ControlShowView *controlView = [ControlShowView new];
     self.controlView = controlView;
@@ -107,7 +141,7 @@
                 make.right.mas_equalTo(UIApplication.sharedApplication.keyWindow);
                 make.bottom.mas_equalTo(UIApplication.sharedApplication.keyWindow);
             }];
-            NSLog(@"");
+            NSLog(@"%@",NSStringFromUIEdgeInsets(self.superview.safeAreaInsets));
             break;
             
         }
@@ -144,26 +178,25 @@
 #pragma ControlShowViewDelegate
 
 - (void)fullScreen {
-    
-    //这里做全屏处理
-    NSLog(@"这里做全屏处理");
     AppDelegate  *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     appDelegate.allowRotation = 1;
     if (!self.isFullScreen) {
-        [UIView animateWithDuration:1 animations:^{
+        [UIView animateWithDuration:0.25 animations:^{
             [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIInterfaceOrientationLandscapeRight] forKey:@"orientation"];
         }];
     } else {
-        [UIView animateWithDuration:1 animations:^{
+        [UIView animateWithDuration:0.25 animations:^{
             [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIInterfaceOrientationPortrait] forKey:@"orientation"];
         }];
     }
     
 }
 
-- (void)playChangeState:(ButtonState)btnState {
-    
-    
+- (void)playChangeState:(ControlShowView *)controlViiew {
+
+    if ([self.delegate respondsToSelector:@selector(playShowViewState:)]) {
+        [self.delegate playShowViewState:self];
+    }
 }
 
 
@@ -224,6 +257,26 @@
     return self;
 }
 
+- (void)setProgressValue:(CGFloat)progressValue {
+    _progressValue = progressValue;
+    self.progressView.progressValue = progressValue;
+}
+
+- (void)setTotalTimeValue:(CGFloat)totalTimeValue {
+    _totalTimeValue = totalTimeValue;
+    self.progressView.totalTimeValue = totalTimeValue;
+}
+
+- (void)setCurrentTimeValue:(CGFloat)currentTimeValue {
+    _currentTimeValue = currentTimeValue;
+    self.progressView.currentTimeValue = currentTimeValue;
+}
+
+- (void)setProgressBlock:(ProgressBlock)progressBlock {
+    _progressBlock = progressBlock;
+    self.progressView.progressBlock = progressBlock;
+}
+
 - (void)initData {
     self.btnState = ButtonStatePause;
 }
@@ -251,6 +304,7 @@
     ControlShowProgressView *progressView = [ControlShowProgressView new];
     [self addSubview:progressView];
     progressView.backgroundColor = [UIColor clearColor];
+    self.progressView = progressView;
     
     [progressView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.mas_safeAreaLayoutGuideLeft).mas_offset(10);
@@ -288,20 +342,24 @@
 
 - (void)actionPlayBtn:(UIButton *)sender {
     
-    switch (self.btnState) {
-        case ButtonStatePause:
-        {
-            self.btnState = ButtonStatePlaying;
-            break;
-        }
-        case ButtonStatePlaying:
-        {
-            self.btnState = ButtonStatePause;
-            break;
-        }
-        default:
-            break;
+    if ([self.delegate respondsToSelector:@selector(playChangeState:)]) {
+        [self.delegate playChangeState:self];
     }
+//    
+//    switch (self.btnState) {
+//        case ButtonStatePause:
+//        {
+//            self.btnState = ButtonStatePlaying;
+//            break;
+//        }
+//        case ButtonStatePlaying:
+//        {
+//            self.btnState = ButtonStatePause;
+//            break;
+//        }
+//        default:
+//            break;
+//    }
 }
 
 - (void)refreshButtonImage {
@@ -385,6 +443,25 @@
     return self;
 }
 
+- (void)setProgressValue:(CGFloat)progressValue {
+    _progressValue = progressValue;
+    self.playProgress.value = progressValue;
+}
+
+- (void)setTotalTimeValue:(CGFloat)totalTimeValue {
+    _totalTimeValue = totalTimeValue;
+    self.totalTimerLabel.text = [NSString stringWithFormat:@"%02d:%02d",(int)totalTimeValue/60,(int)totalTimeValue % 60];
+}
+
+- (void)setCurrentTimeValue:(CGFloat)currentTimeValue {
+    _currentTimeValue = currentTimeValue;
+    self.curTimerLabel.text = [NSString stringWithFormat:@"%02d:%02d",(int)currentTimeValue/60,(int)currentTimeValue % 60];
+}
+
+- (void)setProgressBlock:(ProgressBlock)progressBlock {
+    _progressBlock = progressBlock;
+}
+
 - (void)setupUI {
     //进度View
     UILabel *curTimerLabel = [UILabel new];
@@ -444,6 +521,10 @@
 
 - (void)actionSlider:(UISlider *)sender {
     
+    if (self.progressBlock) {
+         self.progressBlock(sender.value);
+    }
+   
     
 }
 

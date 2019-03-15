@@ -10,7 +10,45 @@
 #import <AVFoundation/AVFoundation.h>
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void(^ProgressBlock)(CGFloat currentValue);
+
+typedef NS_ENUM(NSUInteger,ButtonState) {
+    ButtonStatePlaying,
+    ButtonStatePause,
+};
+
+@class ControlShowView;
+@class PlayerShowView;
+
+@protocol ControlShowViewDelegate <NSObject>
+
+@optional
+- (void)playChangeState:(ControlShowView *)controlViiew;
+
+- (void)fullScreen;
+
+@end
+
+@protocol PlayerShowViewDelegate <NSObject>
+
+@optional
+- (void)playShowViewState:(PlayerShowView *)showView;
+
+@end
+
 @interface PlayerShowView : UIView
+
+@property (nonatomic,assign)ButtonState btnState;
+
+@property (nonatomic,assign)CGFloat progressValue;
+
+@property (nonatomic,assign)CGFloat totalTimeValue;
+
+@property (nonatomic,assign)CGFloat currentTimeValue;
+
+@property (nonatomic,weak)id<PlayerShowViewDelegate> delegate;
+
+@property (nonatomic,copy)ProgressBlock progressBlock;
 
 /**
  根据播放器设置页面
@@ -21,29 +59,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-typedef NS_ENUM(NSUInteger,ButtonState) {
-    ButtonStatePlaying,
-    ButtonStatePause,
-};
-
-@protocol ControlShowViewDelegate <NSObject>
-
-- (void)playChangeState:(ButtonState)btnState;
-
-- (void)fullScreen;
-
-@end
 
 @interface ControlShowView : UIView
 
 @property (nonatomic,assign)ButtonState btnState;
 
+@property (nonatomic,assign)CGFloat progressValue;
+
+@property (nonatomic,assign)CGFloat totalTimeValue;
+
+@property (nonatomic,assign)CGFloat currentTimeValue;
+
 @property (nonatomic,weak)id<ControlShowViewDelegate> delegate;
+
+@property (nonatomic,copy)ProgressBlock progressBlock;
 
 @end
 
+
 @interface ControlShowProgressView : UIView
 
+@property (nonatomic,assign)CGFloat progressValue;
+
+@property (nonatomic,assign)CGFloat totalTimeValue;
+
+@property (nonatomic,assign)CGFloat currentTimeValue;
+
+@property (nonatomic,copy)ProgressBlock progressBlock;
 
 @end
 

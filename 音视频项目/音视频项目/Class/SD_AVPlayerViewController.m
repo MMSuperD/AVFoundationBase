@@ -43,7 +43,14 @@
     NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"jlzg0226" ofType:@"mp4"]];
     PlayerControl *manager = [[PlayerControl alloc] initWithURL:url withControlView:showView];
     self.manager = manager;
+    
+   NSLog(@"%@",NSStringFromUIEdgeInsets(self.view.safeAreaInsets));
+    NSLog(@"%@",self.view.safeAreaLayoutGuide);
+    
 }
+
+
+
 
 
 @end
